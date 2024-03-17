@@ -14,8 +14,7 @@ const postSchema = new mongoose.Schema({
         type: String
     },
     pitch: {
-        type: String,
-        required: true
+        type: String
     },
     likes: [{
         type: mongoose.Schema.Types.ObjectId,
