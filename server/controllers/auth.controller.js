@@ -8,13 +8,19 @@ const jwt_secret = process.env.SECRET;
 const registerController = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
+
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
         if (existingUser) {
             return res.status(400).json({ error: "User Already Exists" });
         }
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-        const newUser = new User({ username, email, password: hashedPassword });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = new User({
+            ...req.body,
+            password: hashedPassword,
+        });
+
         const savedUser = await newUser.save();
         res.status(200).json(savedUser);
     } catch (error) {
