@@ -2,25 +2,20 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 dotenv.config();
 
-
-const connectDB = async (req, res) => {
+const connectDB = async () => {
     try {
-
         if (!process.env.MONGO_URI || !process.env.DBNAME) {
-            res.json("MONGO_URI or DBNAME is missing in environment variables");
+            throw new Error("MONGO_URI or DBNAME is missing in environment variables");
         }
 
-        const connection = await mongoose.connect(`${process.env.MONGO_URI}/${process.env.DBNAME}`)
-        if (connection) {
-            return res.status(200).json({ msg: "DataBase Connected Succesfully !! " })
-        }
-        else {
-            res.json("Database connection failed");
-        }
+        const connection = await mongoose.connect(`${process.env.MONGO_URI}/${process.env.DBNAME}`);
+        
+        console.log("Database Connected Successfully!!");
+        return connection;
     } catch (error) {
-        return res.status(500).json({ msg: "Error In Connecting Database", err: error })
+        console.error("Error In Connecting Database", error);
+        throw error;
     }
 }
 
-
-module.exports = connectDB
+module.exports = connectDB;
