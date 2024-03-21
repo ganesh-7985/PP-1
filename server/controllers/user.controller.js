@@ -15,8 +15,8 @@ const getAllUsersController = async (req, res) => {
 };
 
 const getUserByIdController = async (req, res) => {
+    const { userId } = req.body;
     try {
-        const { userId } = req.body;
         const existingUser = await User.findById(userId);
         if (!existingUser) {
             return res.status(404).json({ msg: "No user exists with this ID" });
@@ -29,18 +29,15 @@ const getUserByIdController = async (req, res) => {
 
 const getAllInvestorController = async (req, res) => {
     try {
-        const { typeOfUser } = req.body;
-        if (typeOfUser === 'Investor') {
-            const allInvestors = await User.find({ typeOfUser: "Investor" });
-            if (!allInvestors || allInvestors.length === 0) {
-                return res.status(404).json({ msg: "No Investors Found" });
-            }
-            res.status(200).json(allInvestors);
-        } else {
-            res.status(400).json({ msg: "Invalid request" });
+        const allInvestors = await User.find({ typeOfUser: "Investor" });
+
+        if (allInvestors.length === 0) {
+            return res.status(404).json({ msg: "No Investors Found" });
         }
+
+        return res.status(200).json(allInvestors);
     } catch (error) {
-        res.status(500).json({ msg: "Error in fetching Investors", err: error });
+        return res.status(500).json({ msg: "Error in fetching Investors", error: error.message });
     }
 };
 
@@ -58,8 +55,8 @@ const updateUserDetailsController = async (req, res) => {
 };
 
 const deleteUserController = async (req, res) => {
+    const { userId } = req.params;
     try {
-        const { userId } = req.body;
         const deletedUser = await User.findByIdAndDelete(userId);
         if (!deletedUser) {
             return res.status(404).json({ msg: "User not found" });

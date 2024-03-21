@@ -4,20 +4,15 @@ dotenv.config();
 
 const verifyToken = async (req, res, next) => {
     try {
-        const token = req.cookies.token;
+        const token = req.headers.authorization;
         if (!token) {
-            return res.status(500).json("You're not authenticated!");
+            return res.status(401).json({ error: "You're not authenticated!" });
         }
-        jwt.verify(token, process.env.SECRET,async(err,data)=>{
-            if(err){
-                  res.json("Token is not valid!",403)
-            }
-            req.userId=data._id
-            next()
-        });
-        
+        const decoded = jwt.verify(token, process.env.SECRET);
+        req.user = decoded;
+        next();
     } catch (error) {
-        next(error);
+        return res.status(401).json({ error: "Invalid token" });
     }
 };
 
